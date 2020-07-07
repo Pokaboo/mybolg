@@ -4,4 +4,4 @@
 >
 > 记录生活已经工作中遇到的心得体会
 
-![raw](https://github.com/Pokaboo/mybolg/raw/master/docs/icon/bug.png)
+![](https://github.com/Pokaboo/mybolg/blob/master/docs/icon/bug.png)
