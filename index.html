@@ -21,6 +21,7 @@
       subMaxLevel: 3,
 	  auto2top: true,//切换页面后是否自动跳转到页面顶部
 	  homepage: 'README.md',
+	  disqus: 'shortname',
       //全文搜索
       search: {
         //maxAge: 86400000, // 过期时间，单位毫秒，默认一天
@@ -30,6 +31,9 @@
         // 搜索标题的最大程级, 1 - 6
         depth: 3,
       },
+	   plugins: [
+        EditOnGithubPlugin.create('https://github.com/Pokaboo/mybolg')
+      ],
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
@@ -43,5 +47,7 @@
   <script src="//unpkg.com/docsify/lib/plugins/zoom-image.js"></script>
   <!-- 字数统计 -->
   <script src="//unpkg.com/docsify-count/dist/countable.js"></script>
+  <!-- Disqus评论系统支持 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/disqus.min.js"></script>
 </body>
 </html>
