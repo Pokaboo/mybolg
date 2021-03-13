@@ -1,7 +1,7 @@
 * 计算机基础
 
 * java
-	* [java基础](.doc/a-1Java基础.md)
+	* [java基础](./docs/a-1Java基础.md)
 	* [java多线程](.doc)
 	* [java集合](./docs/b-2Java集合.md)
 	* [jvm](.doc)
