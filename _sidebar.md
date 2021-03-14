@@ -1,16 +1,16 @@
 * 计算机基础
 
 * java
-	* [java基础](./docs/a-1Java基础.md)
+	* [java基础](./docs/java基础.md)
+	* [java集合](./docs/java集合.md)
 	* [java多线程](.doc)
-	* [java集合](./docs/b-2Java集合.md)
 	* [jvm](.doc)
 	* [Spring](.doc)
 	* [MyBaits](.doc)
 	* [SpringMvc](.doc)
 	* [SpringBoot](.doc)
 	* [SpringCloud](.doc)
-	* [Nginx](.doc)
+	* [Nginx](./docs/Nginx.md)
 	* [dubbo](.doc)
 * 数据库
 	* [Mysql](.doc)
