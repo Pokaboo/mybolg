@@ -60,3 +60,12 @@
 多出来的系统资源可以给其他的中间件去服务了。
 ```
 
+### nginx.conf配置结构
+- main：全局配置
+- event：配置工作模式（默认使用epoll）以及连接数
+- http：http模块相关配置
+   - server：虚拟主机配置，可以有多个
+   - location：路由规则，表达式
+   - upstream：集群，内外服务器
+
+[![60rA6f.png](https://s3.ax1x.com/2021/03/14/60rA6f.png)](https://imgtu.com/i/60rA6f)
