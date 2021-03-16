@@ -61,7 +61,8 @@
 ```
 
 ### nginx.conf配置结构
-- main：全局配置
+
+- - main：全局配置
 - event：配置工作模式（默认使用epoll）以及连接数
 - http：http模块相关配置
    - server：虚拟主机配置，可以有多个
@@ -69,3 +70,49 @@
    - upstream：集群，内外服务器
 
 [![60rA6f.png](https://s3.ax1x.com/2021/03/14/60rA6f.png)](https://imgtu.com/i/60rA6f)
+
+### nginx跨域以及防盗链配置
+
+- 跨域：
+
+  ```
+  #允许跨域请求的域，*代表所有
+  add_header 'Access-Control-Allow-Origin' *;
+  #允许带上cookie请求
+  add_header 'Access-Control-Allow-Credentials' 'true';
+  #允许请求的方法，比如 GET/POST/PUT/DELETE
+  add_header 'Access-Control-Allow-Methods' *;
+  #允许请求的header
+  add_header 'Access-Control-Allow-Headers' *;
+  ```
+
+  
+
+- 防盗链配置：
+
+  ```
+  #对源站点验证
+  valid_referers *.pokaboo.com;
+  #非法引入会进入下方判断
+  if ($invalid_referer) {
+  	return 404;
+  }
+  ```
+
+### Nginx集群负载均衡
+- 七层、四层负载均衡
+
+  | 层级   | 名称       | 说明                                     |
+  | ------ | ---------- | ---------------------------------------- |
+  | 第七层 | 应用层     | 与用户行为交互                           |
+  | 第六层 | 表示层     | 定义数据格式以及数据加密                 |
+  | 第五层 | 会话层     | 创建、管理以及销毁会话                   |
+  | 第四层 | 传输层     | 创建、管理请求端到响应端（端到端）的连接 |
+  | 第三层 | 网络层     | 请求端的IP地址                           |
+  | 第二层 | 数据链路层 | 提供介质访问与链路管理                   |
+  | 第一层 | 物理层     | 传输介质，物理媒介                       |
+
+- 负载均衡-轮询
+
+- 负载均衡-权重
+
