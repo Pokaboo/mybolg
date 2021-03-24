@@ -134,7 +134,8 @@
 - 负载均衡之url_hash:根据每次请求的url地址，hash后访问到固定的服务器节点。
 - 负载均衡之least_conn:最少连接数
 
-
+### Nginx控制浏览器缓存
+- expires指令
 
 
 

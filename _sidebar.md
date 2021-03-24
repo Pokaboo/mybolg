@@ -12,6 +12,7 @@
 	* [SpringCloud](.doc)
 	* [Nginx](./docs/Nginx.md)
 	* [dubbo](.doc)
+	
 * 数据库
 	* [Mysql](.doc)
 	* [Oracel](.doc)
@@ -19,11 +20,14 @@
 	* [ElasticSearch](.doc)
 	* [Memcache](.doc)
 	* [MongoDb](.doc)
+	
 * 前端
 	* [前端基础](.doc)
 	* [vue](.doc)
-* python
-
+	
+* 数据结构
+    
+    * [数据结构](./docs/DataStructure.md)
 * leetcode
 
   
