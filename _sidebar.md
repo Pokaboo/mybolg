@@ -16,7 +16,7 @@
 * 数据库
 	* [Mysql](.doc)
 	* [Oracel](.doc)
-	* [redis](.doc)
+	* [redis](.docs/Redis.md)
 	* [ElasticSearch](.doc)
 	* [Memcache](.doc)
 	* [MongoDb](.doc)
@@ -26,7 +26,7 @@
 	* [vue](.doc)
 	
 * 数据结构
-    
+  
     * [数据结构](./docs/DataStructure.md)
 * leetcode
 

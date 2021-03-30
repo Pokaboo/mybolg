@@ -137,6 +137,15 @@
 ### Nginx控制浏览器缓存
 - expires指令
 
+### Nginx高可用
+- Keepalived:虚拟路由冗余协议 （VRRP）
+    - 解决内网单机故障的路由协议
+    - 构建有多个路由器
+    - 虚拟ip-VIP
+- Keepalived双机主备原理 
+[![cpSrvQ.png](https://z3.ax1x.com/2021/03/28/cpSrvQ.png)](https://imgtu.com/i/cpSrvQ)
+
+
 
 
 
