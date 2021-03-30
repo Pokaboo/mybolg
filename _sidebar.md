@@ -16,7 +16,7 @@
 * 数据库
 	* [Mysql](.doc)
 	* [Oracel](.doc)
-	* [redis](.docs/Redis.md)
+	* [Redis](./docs/Redis.md)
 	* [ElasticSearch](.doc)
 	* [Memcache](.doc)
 	* [MongoDb](.doc)
