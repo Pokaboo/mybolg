@@ -8,7 +8,7 @@
 	* [Spring](.doc)
 	* [MyBaits](.doc)
 	* [SpringMvc](.doc)
-	* [SpringBoot](.doc)
+	* [SpringBoot](./docs/SpringBoot.md)
 	* [SpringCloud](.doc)
 	* [Nginx](./docs/Nginx.md)
 	* [dubbo](.doc)
