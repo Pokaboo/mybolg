@@ -22,7 +22,7 @@
 	* [MongoDb](.doc)
 
 * 分布式核心问题 
-    * [分布式会话与单点登录SSO](./docs/分布式会话与SSO.md)
+    * [分布式会话与单点登录SSO](./docs/session&sso.md)
     * [分布式搜索引擎-Elasticsearch](.doc)
     * [分布式文件系统-FastDFS+阿里OSS](.doc)
     * [分布式消息队列-RabbitMQ](.doc)
