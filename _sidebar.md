@@ -20,6 +20,17 @@
 	* [ElasticSearch](.doc)
 	* [Memcache](.doc)
 	* [MongoDb](.doc)
+
+* 分布式核心问题 
+    * [分布式会话与单点登录SSO](./docs/分布式会话与单点登录SSO.md)
+    * [分布式搜索引擎-Elasticsearch](.doc)
+    * [分布式文件系统-FastDFS+阿里OSS](.doc)
+    * [分布式消息队列-RabbitMQ](.doc)
+    * [ 分布式消息队列-Kafka-1](.doc)
+    * [分布式锁](.doc)
+    * [读写分离、分库分表](.doc)
+    * [分布式全局ID、分布式事务和数据一致性](.doc)
+    * [分布式接口幂等性，分布式限流](.doc)
 	
 * 前端
 	* [前端基础](.doc)
