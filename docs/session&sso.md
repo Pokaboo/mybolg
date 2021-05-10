@@ -71,6 +71,270 @@
 
     [![cTYTyj.png](https://z3.ax1x.com/2021/04/19/cTYTyj.png)](https://imgtu.com/i/cTYTyj)
 
- ### 用户会话
+### 用户会话
  - redis用户会话
  - SpringSession
+
+### 分布式会话拦截器
+- 前端：header中携带：headerUserId、headerUserToken
+
+  ```
+  axios.post(
+      serverUrl + '/userInfo/update?userId=' + userInfo.id,
+      userInfoMore, {
+        headers: {
+          'headerUserId': userInfo.id,
+          'headerUserToken': userInfo.userUniqueToken
+        }
+      })
+    .then(res => {
+      if (res.data.status == 200) {
+        alert("用户信息修改成功!");
+        window.location.reload();
+      } else {
+        alert(res.data.msg);
+        console.log(res.data.msg);
+      }
+    });
+  ```
+
+- 后端：自定义拦截器，拦截请求
+
+  ```
+  package com.pookaboo.interceptor;
+  
+  import com.pookaboo.utils.CustomJSONResult;
+  import com.pookaboo.utils.JsonUtils;
+  import com.pookaboo.utils.RedisOperator;
+  import org.apache.commons.lang3.StringUtils;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.web.servlet.HandlerInterceptor;
+  import org.springframework.web.servlet.ModelAndView;
+  
+  import javax.servlet.http.HttpServletRequest;
+  import javax.servlet.http.HttpServletResponse;
+  import java.io.IOException;
+  import java.io.OutputStream;
+  
+  /**
+   * UserToken拦截器
+   */
+  public class UserTokenInterceptor implements HandlerInterceptor {
+  
+      public static final String REDIS_USER_TOKEN = "redis_user_token";
+  
+      @Autowired
+      private RedisOperator redisOperator;
+  
+      /**
+       * 拦截请求，在调用controller之前调用
+       *
+       * @param request
+       * @param response
+       * @param handler
+       * @return
+       * @throws Exception
+       */
+      @Override
+      public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+  
+          String userId = request.getHeader("headerUserId");
+          String userToken = request.getHeader("headerUserToken");
+  
+          if (StringUtils.isNotBlank(userId) && StringUtils.isNotBlank(userToken)) {
+              String uniqueToken = redisOperator.get(REDIS_USER_TOKEN + ":" + userId);
+              if (StringUtils.isBlank(uniqueToken)) {
+                  returnErrorResponse(response, CustomJSONResult.errorMsg("请登录..."));
+                  return false;
+              } else {
+                  if (!uniqueToken.equals(userToken)) {
+                      returnErrorResponse(response, CustomJSONResult.errorMsg("账号在异地登录..."));
+                      return false;
+                  }
+              }
+          } else {
+              returnErrorResponse(response, CustomJSONResult.errorMsg("请登录..."));
+              return false;
+          }
+          return true;
+      }
+      
+      
+      /**
+       * 拦截信息返回
+       * @param response
+       * @param customJSONResult
+       */
+      private void returnErrorResponse(HttpServletResponse response, CustomJSONResult customJSONResult) {
+          OutputStream out = null;
+          try {
+              response.setCharacterEncoding("utf-8");
+              response.setContentType("text/json");
+              out = response.getOutputStream();
+              out.write(JsonUtils.objectToJson(customJSONResult).getBytes("utf-8"));
+              out.flush();
+          } catch (IOException e) {
+              e.printStackTrace();
+          } finally {
+              try {
+                  if (out != null) {
+                      out.close();
+                  }
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
+          }
+  
+  
+      }
+  
+      /**
+       * 在请求访问controller之后，渲染视图之前
+       *
+       * @param request
+       * @param response
+       * @param handler
+       * @param modelAndView
+       * @throws Exception
+       */
+      @Override
+      public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+  
+      }
+  
+      /**
+       * 在请求访问controller之后，渲染视图之后
+       *
+       * @param request
+       * @param response
+       * @param handler
+       * @param ex
+       * @throws Exception
+       */
+      @Override
+      public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+  
+      }
+  }
+  
+  ```
+
+- 自定义拦截器需要配置
+
+  ```
+  package com.pookaboo.config;
+  
+  import com.pookaboo.interceptor.UserTokenInterceptor;
+  import org.springframework.boot.web.client.RestTemplateBuilder;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.web.client.RestTemplate;
+  import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+  import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+  import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+  
+  @Configuration
+  public class WebMvcConfig implements WebMvcConfigurer {
+  
+      @Bean
+      public UserTokenInterceptor buildUserTokenInterceptor() {
+          return new UserTokenInterceptor();
+      }
+  
+      /**
+       * 注册拦截器
+       *
+       * @param registry
+       */
+      @Override
+      public void addInterceptors(InterceptorRegistry registry) {
+          registry.addInterceptor(buildUserTokenInterceptor())
+                  .addPathPatterns("/hello")
+                  .addPathPatterns("/shopcart/add")
+                  .addPathPatterns("/shopcart/del")
+                  .addPathPatterns("/address/list")
+                  .addPathPatterns("/address/add")
+                  .addPathPatterns("/address/update")
+                  .addPathPatterns("/address/setDefalut")
+                  .addPathPatterns("/address/delete")
+                  .addPathPatterns("/orders/*")
+                  .addPathPatterns("/center/*")
+                  .addPathPatterns("/userInfo/*")
+                  .addPathPatterns("/myorders/*")
+                  .addPathPatterns("/mycomments/*")
+                  .excludePathPatterns("/myorders/deliver")
+                  .excludePathPatterns("/orders/notifyMerchantOrderPaid");
+  
+          WebMvcConfigurer.super.addInterceptors(registry);
+      }
+  }
+  
+  ```
+
+
+### 单点登录SSO
+- 相同顶级域名的单点登录SSO
+    - 比如说现在有个一级域名为 www.imooc.com ，是教育类网站，但是慕课网有其他的产品线，可以通过构建二级域名提供服务给用户访问，比如： music.imoo
+  op.imooc.com ， blog.imooc.com 等等，分别为慕课音乐，慕课电商以及慕课博客等，用户只需要在其中一个站点登录，那么其他站点也会随之而登录。
+  也就是说，用户自始至终只在某一个网站下登录后，那么他所产生的会话，就共享给了其他的网站，实现了单点网站登录后，同时间接登录了其他的网站，那么
+  单点登录，他们的会话是共享的，都是同一个用户会话。
+    
+    - Cookie + Redis 实现 SSO：
+    
+      ```
+      那么之前我们所实现的分布式会话后端是基于redis的，如此会话可以流窜在后端的任意系统，都能获取到缓存中的用户数据信息，前端通过使用cookie，可以保
+      一级二级下获取，那么这样一来，cookie中的信息userid和token是可以在发送请求的时候携带上的，这样从前端请求后端后是可以获取拿到的，这样一来，其实
+      登录注册以后，其实cookie和redis中都会带有用户信息，只要用户不退出，那么就能在任意一个站点实现登录了。
+      那么这个原理主要也是cookie和网站的依赖关系，顶级域名 www.imooc.com 和*.imooc.com 的cookie值是可以共享的，可以被携带
+      比如设置为 .imooc.com ， .t.mukewang.com ，如此是OK的。
+      二级域名自己的独立cookie是不能共享的，不能被其他二级域名获取，比如： music.imooc.com 的cookie是不能被mtv.imooc.com 共
+      互不影响，要共享必须设置为.imooc.com 。
+      ```
+    
+  
+- 不同顶级域名的单点登录CAS	
+    么如果顶级域名都不一样，咋办？比如 www.imooc.com 要和www.mukewang.com 的会话实现共享，这个时候又
+下图，这个时候的cookie由于顶级域名不同，就不能实现cookie跨域了，每个站点各自请求到服务端，cookie无法同步。比如，www.imooc.com下的用户发起请
+ie，但是他又访问了www.abc.com，由于cookie无法携带，所以会要你二次登录。
+[![gN6aWR.jpg](https://z3.ax1x.com/2021/05/10/gN6aWR.jpg)](https://imgtu.com/i/gN6aWR)
+
+- SSO时序图
+[![gNymgx.png](https://z3.ax1x.com/2021/05/10/gNymgx.png)](https://imgtu.com/i/gNymgx)
+
+```
+用户访问系统1的受保护资源，系统1发现用户未登录，跳转至sso认证中心，并将自己的地址作为参数
+sso认证中心发现用户未登录，将用户引导至登录页面
+用户输入用户名密码提交登录申请
+sso认证中心校验用户信息，创建用户与sso认证中心之间的会话，称为全局会话，同时创建授权令牌
+sso认证中心带着令牌跳转会最初的请求地址（系统1）
+系统1拿到令牌，去sso认证中心校验令牌是否有效
+sso认证中心校验令牌，返回有效，注册系统1
+系统1使用该令牌创建与用户的会话，称为局部会话，返回受保护资源
+用户访问系统2的受保护资源
+系统2发现用户未登录，跳转至sso认证中心，并将自己的地址作为参数
+sso认证中心发现用户已登录，跳转回系统2的地址，并附上令牌
+系统2拿到令牌，去sso认证中心校验令牌是否有效
+sso认证中心校验令牌，返回有效，注册系统2
+系统2使用该令牌创建与用户的局部会话，返回受保护资源
+　　用户登录成功之后，会与sso认证中心及各个子系统建立会话，用户与sso认证中心建立的会话称为全局会话，用户与各个子系统建立的会话称为局部会话，局部会话建立之后，用户访问子系统受保护资源将不再通过sso认证中心，全局会话与局部会话有如下约束关系
+
+局部会话存在，全局会话一定存在
+全局会话存在，局部会话不一定存在
+全局会话销毁，局部会话必须销毁
+
+```
+
+- 单点注销时序图
+
+[![gNc81I.png](https://z3.ax1x.com/2021/05/10/gNc81I.png)](https://imgtu.com/i/gNc81I)
+
+```
+用户向系统1发起注销请求
+系统1根据用户与系统1建立的会话id拿到令牌，向sso认证中心发起注销请求
+sso认证中心校验令牌有效，销毁全局会话，同时取出所有用此令牌注册的系统地址
+sso认证中心向所有注册系统发起注销请求
+各注册系统接收sso认证中心的注销请求，销毁局部会话
+sso认证中心引导用户至登录页面
+
+```
+
