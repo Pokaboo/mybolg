@@ -1,7 +1,1 @@
-# Pokaboo 随记
-
-* Try your best when you are young.Never regret. 
-
-  
-
-![](./docs/icon/cool.png)
+地址：`https://pokaboo.github.io/mybolg/#/`
