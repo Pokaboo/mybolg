@@ -12,7 +12,7 @@
 
 ### 方案一： 采用原生的Http请求
 
-```
+```java
 @RequestMapping("/doPostGetJson")
 public String doPostGetJson() throws ParseException {
    //此处将要发送的数据转换为json格式字符串
@@ -52,7 +52,7 @@ public static JSONObject doPost(JSONObject date) {
 ### 方案二: 采用Feign进行消费
 - 1、在maven项目中添加依赖
 
-  ```
+  ```java
   <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-feign</artifactId>
@@ -64,7 +64,7 @@ public static JSONObject doPost(JSONObject date) {
 
 - 2、编写接口，放置在service层:这里的decisionEngine.url 是配置在properties中的 是ip地址和端口号decisionEngine.url=http://10.2.1.148:3333/decision/person 是接口名字
 
-  ```
+  ```java
   @FeignClient(url = "${decisionEngine.url}",name="engine")
   public interface DecisionEngineService {
   　　@RequestMapping(value="/decision/person",method= RequestMethod.POST)
@@ -77,7 +77,7 @@ public static JSONObject doPost(JSONObject date) {
 
 - 3、在Java的启动类上加上@EnableFeignClients
 
-  ```
+  ```java
   @EnableFeignClients //参见此处
   @EnableDiscoveryClient
   @SpringBootApplication
@@ -100,7 +100,7 @@ public static JSONObject doPost(JSONObject date) {
 
 - 4、在代码中调用接口即可
 
-  ```
+  ```java
   @Autowired
   private DecisionEngineService decisionEngineService ;
   // ...
@@ -110,7 +110,7 @@ public static JSONObject doPost(JSONObject date) {
 ### 方案三: 采用RestTemplate方法
 - 1、Get请求之——getForEntity(Stringurl,Class responseType,Object…urlVariables)：该方法提供了三个参数，其中url为请求的地址，responseType为请求响应body的包装类型，urlVariables为url中的参数绑定，该方法的参考调用如下：
 
-  ```
+  ```java
   // http://USER-SERVICE/user?name={name)
   RestTemplate restTemplate=new RestTemplate();
   Map<String,String> params=new HashMap<>();
@@ -122,7 +122,7 @@ public static JSONObject doPost(JSONObject date) {
 
 - 2、Get请求之——getForEntity(URI url,Class responseType):该方法使用URI对象来替代之前的url和urlVariables参数来指定访问地址和参数绑定。URI是JDK [http://java.net](https://link.zhihu.com/?target=http%3A//java.net)包下的一个类，表示一个统一资源标识符(Uniform Resource Identifier)引用。参考如下：
 
-  ```
+  ```java
   RestTemplate restTemplate=new RestTemplate();
   UriComponents uriComponents=UriComponentsBuilder.fromUriString("http://USER-SERVICE/user?name={name}")
       .build()
@@ -136,7 +136,7 @@ public static JSONObject doPost(JSONObject date) {
 
 - 3、Get请求之——getForObject:getForObject方法可以理解为对getForEntity的进一步封装，它通过HttpMessageConverterExtractor对HTTP的请求响应体body内容进行对象转换，实现请求直接返回包装好的对象内容。getForObject方法有如下
 
-  ```
+  ```java
   getForObject(String url,Class responseType,Object...urlVariables)
   getForObject(String url,Class responseType,Map urlVariables)
   getForObject(URI url,Class responseType)
@@ -146,7 +146,7 @@ public static JSONObject doPost(JSONObject date) {
 
 - 4、Post 请求:Post请求提供有三种方法，postForEntity、postForObject和postForLocation。其中每种方法都存在三种方法，postForEntity方法使用如下：
 
-  ```
+  ```java
   RestTemplate restTemplate=new RestTemplate();
   User user=newUser("didi",30);
   ResponseEntity<String> responseEntity=restTemplate.postForEntity("http://USER-SERVICE/user",user,String.class); //提交的body内容为user对象，请求的返回的body类型为String
@@ -155,7 +155,7 @@ public static JSONObject doPost(JSONObject date) {
 
     - postForEntity存在如下三种方法的重载:
   
-      ```
+      ```java
       postForEntity(String url,Object request,Class responseType,Object... uriVariables)
       postForEntity(String url,Object request,Class responseType,Map uriVariables)
       postForEntity(URI url,Object request，Class responseType)
