@@ -753,3 +753,39 @@ public class SSOController {
 
 ```
 
+
+### 单点登录存在的问题
+- 跨域cookie共享：由于Chrome更改了默认的SameSite属性（http://www.ruanyifeng.com/blog/2019/09/cookie-samesite.html）导致在后去cas的cookie时，一直获取不到
+
+- 解决方案
+    
+    - 1、禁用`SameSite`验证：打开`Chrome`设置，将`chrome://flags/#same-site-by-default-cookies`先禁用，然后重启浏览器。
+        
+    - 2、cookie的SameSite属性改成最低级：**不过，这只是一种权宜之计，因为设置`sameSite`为`None`之后，`CSRF`的风险又回来了。所以，换成`token`的检验方式而不依赖`Cookie`，或许才是更合理的解决方案**
+    
+        ```java
+        public class SameSiteInterceptor implements HandlerInterceptor {
+            @Override
+            public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+                return true;
+            }
+        
+            @Override
+            public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+            }
+        
+            @Override
+            public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+                Collection<String> headers = response.getHeaders(HttpHeaders.SET_COOKIE);
+                boolean firstHeader = true;
+                // there can be multiple Set-Cookie attributes
+                for (String header : headers) { 
+                    // "SameSite=None; Secure;"
+                    response.addHeader(HttpHeaders.SET_COOKIE, String.format("%s; %s", header, "SameSite=None; Secure;"));
+                }
+            }
+        }
+        ```
+    
+        
+
