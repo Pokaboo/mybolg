@@ -755,12 +755,12 @@ public class SSOController {
 
 
 ### 单点登录存在的问题
-- 跨域cookie共享：由于Chrome更改了默认的SameSite属性（http://www.ruanyifeng.com/blog/2019/09/cookie-samesite.html）导致在后去cas的cookie时，一直获取不到
+- 跨域cookie共享：由于Chrome更改了默认的SameSite属性（`http://www.ruanyifeng.com/blog/2019/09/cookie-samesite.html`）导致在获取cas的cookie时，一直获取不到
 
 - 解决方案
-    
+  
     - 1、禁用`SameSite`验证：打开`Chrome`设置，将`chrome://flags/#same-site-by-default-cookies`先禁用，然后重启浏览器。
-        
+      
     - 2、cookie的SameSite属性改成最低级：**不过，这只是一种权宜之计，因为设置`sameSite`为`None`之后，`CSRF`的风险又回来了。所以，换成`token`的检验方式而不依赖`Cookie`，或许才是更合理的解决方案**
     
         ```java
