@@ -12,6 +12,7 @@
 	* [SpringCloud](.doc)
 	* [Nginx](./docs/Nginx.md)
 	* [dubbo](.doc)
+	* [Activiti](./docs/Activiti.md)
 	
 * 数据库
 	* [Mysql](.doc)
