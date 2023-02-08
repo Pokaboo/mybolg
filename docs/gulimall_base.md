@@ -53,3 +53,30 @@
 
   
 
+#### 10、环境搭建
+
+* 安装Virtual Box
+
+* 安装vagrant
+
+  ```
+  https://app.vagrantup.com/boxes/search Vagrant 官方镜像仓库
+  a、打开 window cmd 窗口，输入vagrant，验证是否下载成功
+  b、初始化centos7： Vagrant init centos/7 （注："centos/7 " 的名字和官方镜像仓库的名字是对应的）
+  c、运行 vagrant up 即可启动虚拟机（系统 root 用户的密码是 vagrant）
+  注：如果vagrant up过慢，可以使用中科大镜像
+  vagrant init centos7 https://mirrors.ustc.edu.cn/centos-cloud/centos/7/vagrant/x86_64/images/CentOS-7.box
+  d、vagrant常用命令  
+  cmd窗口：
+  vagrant ssh
+  启动：vagrant up
+  退出：exit
+  ```
+  
+* 虚拟机网络配置
+
+  ```
+  a、当前用户目录下C:\Users\zhaowu，找到Vagrantfile文件。修改config.vm.network "private_network", ip: "192.168.56.10"（ip与cmd命令ipconfig/all下的Virtual Box保持一致：比如为，192.168.56.1则配置成192.168.56.1开头）
+  c、配置完后vagrant reload，然后ping测试
+  ```
+* 安装Docker  
