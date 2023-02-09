@@ -114,3 +114,25 @@
   ```
 
 * 安装redis
+
+  ```
+  1、拉取redis:docker pull redis
+  2、创建配置文件
+  	mkdir -p /mydata/redis/conf
+  	touch /mydata/redis/conf/redis.conf
+  3、启动容器
+  	docker run -p 6379:6379 --name redis \
+      -v /mydata/redis/data:/data \
+      -v /mydata/redis/conf/redis.conf:/etc/redis/redis.conf \
+      -d redis redis-server /etc/redis/redis.conf
+  4、运行 redis
+  	docker exec -it redis redis-cli
+  5、开启 aof 持久化
+  	vi /mydata/redis/conf/redis.conf
+      # 添加如下内容
+      appendonly yes
+  6、重启 redis
+  	docker restart redis
+  ```
+
+  
