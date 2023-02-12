@@ -42,6 +42,7 @@
 
 ### 10、环境搭建
 - 安装Virtual Box
+
 - 安装vagrant
   ```
   https://app.vagrantup.com/boxes/search Vagrant 官方镜像仓库
@@ -120,5 +121,23 @@
   ```
 
 - 环境-开发工具&环境安装配置
+
+- 数据库设计
+
+- 前端部署
+
+  ```
+  1、git clone https://gitee.com/renrenio/renren-fast-vue.git
+  2、将导入的前端模板导入VScode
+  3、npm install
+  4、npm run dev
+  ```
+  
+- 后台管理系统
+
+  ```
+  1、git clone https://gitee.com/renrenio/renren-fast.git
+  2、修改数据库相关配置文件
+  ```
 
   
