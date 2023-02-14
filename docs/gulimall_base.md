@@ -142,9 +142,79 @@
 
 ### 11、SpringCloud Alibaba
 - Spring Cloud Alibaba 致力于提供微服务开发的一站式解决方案。此项目包含开发分布式应用微服务的必需组件，方便开发者通过 Spring Cloud 编程模型轻松使用这些组件来开发分布
-式应用服务。
+  式应用服务。
+
+- pom文件引入SpringCloud Alibaba
+
+  ```xml
+  <dependencyManagement>
+      <dependencies>
+          <dependency>
+              <groupId>com.alibaba.cloud</groupId>
+              <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+              <version>2.1.0.RELEASE</version>
+              <type>pom</type>
+              <scope>import</scope>
+          </dependency>
+      </dependencies>
+  </dependencyManagement>
+  ```
 
 ### 12、Nacos
 - nacos:Nacos 是阿里巴巴开源的一个更易于构建云原生应用的动态服务发现、配置管理和服务管理平台。他是使用 java 编写。需要依赖 java 环境Nacos 文档地址： https://nacos.io/zh-cn/docs/quick-start.htm
+
+- 下载nacos
+
+- 启动 **nacos-server**
+
+  ```tex
+  双击 bin 中的 startup.cmd 文件
+  访问 http://localhost:8848/nacos/
+  使用默认的 nacos/nacos 进行登录
+  ```
+
+- pom文件引入nacos
+
+  ```xml
+  <dependency>
+  	<groupId>com.alibaba.cloud</groupId>
+  	<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+  </dependency>
+  ```
+
 - 使用<font color='orange'>@EnableDiscoveryClient </font>**开启服务注册发现功能**
+
+  ```java
+  @EnableDiscoveryClient
+  @SpringBootApplication
+  public class MallCouponApplication {
+  
+      public static void main(String[] args) {
+          SpringApplication.run(MallCouponApplication.class, args);
+      }
+  
+  }
+  ```
+
+- 修改配置文件
+
+  ```yml
+  server:
+    port: 7000
+  spring:
+    application:
+      name: mall-coupon
+    datasource:
+      username: root
+      password: root
+      url: jdbc:mysql://xxx.xxx.xx.xx:3306/mall_sms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    #配置Nacos Server 地址
+    cloud:
+      nacos:
+        discovery:
+          server-addr: 127.0.0.1:8848
+  ```
+
+  
 
