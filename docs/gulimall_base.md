@@ -140,4 +140,11 @@
   2、修改数据库相关配置文件
   ```
 
-  
+### 11、SpringCloud Alibaba
+- Spring Cloud Alibaba 致力于提供微服务开发的一站式解决方案。此项目包含开发分布式应用微服务的必需组件，方便开发者通过 Spring Cloud 编程模型轻松使用这些组件来开发分布
+式应用服务。
+
+### 12、Nacos
+- nacos:Nacos 是阿里巴巴开源的一个更易于构建云原生应用的动态服务发现、配置管理和服务管理平台。他是使用 java 编写。需要依赖 java 环境Nacos 文档地址： https://nacos.io/zh-cn/docs/quick-start.htm
+- 使用<font color='orange'>@EnableDiscoveryClient </font>**开启服务注册发现功能**
+
