@@ -216,5 +216,119 @@
           server-addr: 127.0.0.1:8848
   ```
 
+### 13、openFeign
+
+- feign是一个声明式的HTTP客户端，他的目的就是让远程调用更加简单。 给远程服务发的是HTTP请求
+
+- 使用步骤
+
+  - 1、使用注解@EnableFeignClients启用feign客户端
+
+    ```java
+    @SpringBootApplication
+    @EnableFeignClients(basePackages = "com.pokaboo.mall.member.feign")
+    @MapperScan("com.pokaboo.mall.member.dao")
+    public class MallMemberApplication {
+    
+        public static void main(String[] args) {
+            SpringApplication.run(MallMemberApplication.class, args);
+        }
+    
+    }
+    ```
+
+    
+
+  - 2、使用注解@FeignClient 定义feign客户端
+
+    ```java
+    @FeignClient("mall-coupon")
+    public interface CouponFenginService {
+    
+        @RequestMapping("coupon/coupon/coupons")
+        public R coupons();
+    }
+    ```
+
+  - 3、使用注解@Autowired使用上面所定义feign的客户端 
+
+    ```java
+    @Autowired
+    private CouponFenginService couponFenginService;
+    
+    @RequestMapping("/coupons")
+    public R test(){
+        R coupons = couponFenginService.coupons();
+        MemberEntity memberEntity = new MemberEntity();
+        memberEntity.setNickname("Pokaboo");
+        return R.ok().put("member",memberEntity).put("coupons",coupons.get("coupons"));
+    }
+    ```
+
+- pom引入
+
+  ```xml
+  <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+  </dependency>
+  ```
+
+- @EnableFeignClients
+
+  ```
+  注解告诉框架扫描所有使用注解@FeignClient定义的feign客户端，并把feign客户端注册到IOC容器中
+  ```
+
+- @FeignClient
+
+  ```
+  使用注解@FeignClient 定义feign客户端 ;
+  ```
+### 14、配置中心
+
+- 引入pom
+
+  ```xml
+  <!--Nacos 配置中心-->
+      <dependency>
+      <groupId>com.alibaba.cloud</groupId>
+      <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+  </dependency>
+  ```
+
+- application.properties文件
+
+  ```xml
+  spring.application.name=mall-coupon
+  spring.cloud.nacos.config.server-addr=192.168.11.1:8848
+  ```
+
+- @RefreshScope
+
+  ```java
+  @RefreshScope
+  @RestController
+  @RequestMapping("coupon/coupon")
+  public class CouponController {
+      @Autowired
+      private CouponService couponService;
+  
+      @Value("${coupon.user.name}")
+      private String userName;
+      @Value("${coupon.user.age}")
+      private Integer userAge;
+  
+      @RequestMapping("/test/configCenter")
+      public R test(){
+          return R.ok().put("userName",userName).put("userAge",userAge);
+      }
+  ```
+
+  ```
+  scope是如何做到热加载的呢？先说结论：
+  因为可以单独管理Bean的创建和销毁 创建Bean的时候如果scope为refresh，这个Bean就缓存在一个专门管理这类scope的map中， 当外部配置更改过后，会触发一个刷新动作，这个动作将上面的map中的Bean清空，这样，当再次用到这个Bean的时候，这些Bean就会重新被IOC容器创建一次，使用最新的外部化配置的值注入类中，达到热加载新值的效果 下面我们深入源码，来验证我们上述的讲法。
+  ```
+
   
 
