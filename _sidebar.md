@@ -30,7 +30,7 @@
     * [分布式全局ID、分布式事务和数据一致性](.doc)
     * [分布式接口幂等性，分布式限流](.doc)
 * 前端
-	* [前端基础](.doc)
+	* [前端基础](./docs/front.md)
 	* [vue](./docs/Vue.md)
 * 数据结构 
     * [数据结构](./docs/DataStructure.md)

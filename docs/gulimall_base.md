@@ -392,7 +392,6 @@ org.springframework.cloud.context.refresh.ContextRefresher 的 refresh 方法 �
   一句话：满足某些断言（predicates）就路由到指定的地址（uri），使用指定的过滤器（filter）
   ```
   
-  28
 
 
 
