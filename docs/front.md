@@ -14,8 +14,13 @@
 
 ### 2、常用插件
 
-- 常用插件1：![](icon/plugin1.png)
-- 常用插件2：![](icon/plugin2.png)
+- 常用插件1：
+
+  [![pSv0K2T.png](https://s1.ax1x.com/2023/02/22/pSv0K2T.png)](https://imgse.com/i/pSv0K2T)
+
+- 常用插件2：
+
+  [![pSv0uGV.png](https://s1.ax1x.com/2023/02/22/pSv0uGV.png)](https://imgse.com/i/pSv0uGV)
 
 ### 3、基本语法
 
