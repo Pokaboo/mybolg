@@ -4,6 +4,7 @@
 	* [java集合](./docs/java集合.md)
 	* [java多线程](.doc)
 	* [jvm](.doc)
+	* [Maven](./docs/Maven.md)
 	* [Spring](.doc)
 	* [MyBaits](.doc)
 	* [SpringMvc](.doc)
