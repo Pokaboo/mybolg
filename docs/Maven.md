@@ -49,3 +49,39 @@
   | provided |       有效       |       有效       |       有效       |         无效         |
   |   test   |       无效       |       有效       |       有效       |         无效         |
 
+#### 依赖的传递性
+
+- 概念：A依赖B，B依赖C，那么在A没有配置对C的依赖的情况下，A里面能不能直接使用C？
+- 传递的原则：在A依赖B，B依赖C的前提下，C是否能够传递到A，取决于B依赖C时使用的依赖范围
+  - B依赖C时使用compile范围：可以传递。
+  - B依赖C时使用test或provided范围：不能传递，所以需要这样的jar包时，就必须在需要的地方明确配置依赖才可以。
+
+#### 依赖的排除
+
+- 概念：当A依赖B，B依赖C而且C可以传递到A的时候，但是A不想要C，需要在A里面把C排除掉。而往往这种情况都是为了避免jar包之间的冲突。所以配置依赖的排除其实就是阻止某些jar包的传递。因为这样的jar包传递过来会和其他jar包冲突。
+
+- 配置方式：使用excludes标签配置依赖的排除。
+
+  ```java
+  <dependency>
+      <groupId>com.pokaboo</groupId>
+      <artifactId>pro01-maven-java</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+      <!-- 使用excludes标签配置依赖的排除    -->
+      <exclusions>
+          <!-- 在exclude标签中配置一个具体的排除 -->
+          <exclusion>
+              <!-- 指定要排除的依赖的坐标（不需要写version） -->
+              <groupId>commons-logging</groupId>
+              <artifactId>commons-logging</artifactId>
+          </exclusion>
+      </exclusions>
+  </dependency>
+  ```
+
+  
+
+#### 继承
+
+- 本质上是A工程的pom.xml中的配置继承了B工程中pom.xml的配置。
