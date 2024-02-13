@@ -62,7 +62,7 @@
 
 - 配置方式：使用excludes标签配置依赖的排除。
 
-  ```java
+  ```xml
   <dependency>
       <groupId>com.pokaboo</groupId>
       <artifactId>pro01-maven-java</artifactId>
