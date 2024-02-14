@@ -44,9 +44,9 @@
 - 返回单个简单数据类型
 
   ```xml
-     <select id="selectEmpCount" resultType="int">
-          select count(*) from t_emp
-      </select>
+  <select id="selectEmpCount" resultType="int">
+      select count(*) from t_emp
+  </select>
   ```
 
 - 返回实体类对象
@@ -59,7 +59,6 @@
       <!-- 给每一个字段设置一个别名，让别名和Java实体类中属性名一致 -->
       select emp_id empId,emp_name empName,emp_salary empSalary from t_emp where emp_id=#{maomi}
   </select>
-  
   <!-- 增加全局配置自动识别对应关系 -->
   <!-- 做了下面的配置，select语句中可以不给字段设置别名 -->
   <!-- 在全局范围内对Mybatis进行配置 -->
@@ -92,11 +91,10 @@
 - 返回List类型：查询结果返回多个实体类对象，希望把多个实体类对象放在List集合中返回。此时不需要任何特殊处理，在resultType属性中还是设置实体类类型即可。
 
   ```xml
-     <!-- List<Employee> selectAll(); -->
-      <select id="selectAll" resultType="com.pokaboo.mybatis.entity.Employee">
-          select emp_id empId,emp_name empName,emp_salary empSalary
-          from t_emp
-      </select>
+  <!-- List<Employee> selectAll(); -->
+  <select id="selectAll" resultType="com.pokaboo.mybatis.entity.Employee">
+      select emp_id empId,emp_name empName,emp_salary empSalary from t_emp
+  </select>
   ```
 
 - 返回自增主键
@@ -106,8 +104,7 @@
   <!-- useGeneratedKeys属性字面意思就是“使用生成的主键” -->
   <!-- keyProperty属性可以指定主键在实体类对象中对应的属性名，Mybatis会将拿到的主键值存入这个属性 -->
   <insert id="insertEmployee" useGeneratedKeys="true" keyProperty="empId">
-      insert into t_emp(emp_name,emp_salary)
-      values(#{empName},#{empSalary})
+      insert into t_emp(emp_name,emp_salary) values (#{empName},#{empSalary})
   </insert>
   ```
 
@@ -117,19 +114,14 @@
 - 不支持自增主键的数据库：而对于不支持自增型主键的数据库（例如 Oracle），则可以使用 selectKey 子元素：selectKey  元素将会首先运行，id  会被设置，然后插入语句会被调用
 
   ```xml
-  
-  <insert id="insertEmployee" 
-          parameterType="com.pokaboo.mybatis.beans.Employee"  databaseId="oracle">
+  <insert id="insertEmployee" parameterType="com.pokaboo.mybatis.beans.Employee"  databaseId="oracle">
           <selectKey order="BEFORE" keyProperty="id" resultType="integer">
               select employee_seq.nextval from dual 
           </selectKey>    
           insert into orcl_employee(id,last_name,email,gender) values(#{id},{lastName},#{email},#{gender})
   </insert>
-  
   <!-- 或者 -->
-  
-  <insert id="insertEmployee" 
-          parameterType="com.pokaboo.mybatis.beans.Employee"  databaseId="oracle">
+  <insert id="insertEmployee" parameterType="com.pokaboo.mybatis.beans.Employee"  databaseId="oracle">
           <selectKey order="AFTER" keyProperty="id"  resultType="integer">
               select employee_seq.currval from dual 
           </selectKey>    
@@ -151,8 +143,6 @@
     </select>
     ```
 
-    
-
     >关于实体类属性的约定：
 
     > getXxx()方法、setXxx()方法把方法名中的get或set去掉，首字母小写。
@@ -171,8 +161,7 @@
 
   ```xml
   <!-- 专门声明一个resultMap设定column到property之间的对应关系 -->
-  <resultMap id="selectEmployeeByRMResultMap" type="com.pokaboo.mybatis.entity.Employee">
-      
+  <resultMap id="selectEmployeeByRMResultMap" type="com.pokaboo.mybatis.entity.Employee">  
       <!-- 使用id标签设置主键列和主键属性之间的对应关系 -->
       <!-- column属性用于指定字段名；property属性用于指定Java实体类属性名 -->
       <id column="emp_id" property="empId"/>
@@ -180,11 +169,70 @@
       <!-- 使用result标签设置普通字段和Java实体类属性之间的关系 -->
       <result column="emp_name" property="empName"/>
       <result column="emp_salary" property="empSalary"/>
-  </resultMap>
-      
+  </resultMap>    
   <!-- Employee selectEmployeeByRM(Integer empId); -->
   <select id="selectEmployeeByRM" resultMap="selectEmployeeByRMResultMap">
       select emp_id,emp_name,emp_salary from t_emp where emp_id=#{empId}
+  </select>
+  ```
+
+### 对象关联
+
+- 一对一 ：<font color='red'>association</font>、<font color='red'>javaType</font>
+
+  ```xml
+  <!-- 创建resultMap实现“对一”关联关系映射 -->
+  <!-- id属性：通常设置为这个resultMap所服务的那条SQL语句的id加上“ResultMap” -->
+  <!-- type属性：要设置为这个resultMap所服务的那条SQL语句最终要返回的类型 -->
+  <resultMap id="selectOrderWithCustomerResultMap" type="com.pokaboo.mybatis.entity.Order">
+      <!-- 先设置Order自身属性和字段的对应关系 -->
+      <id column="order_id" property="orderId"/>
+      <result column="order_name" property="orderName"/>
+      <!-- 使用association标签配置“对一”关联关系 -->
+      <!-- property属性：在Order类中对一的一端进行引用时使用的属性名 -->
+      <!-- javaType属性：一的一端类的全类名 -->
+      <association property="customer" javaType="com.pokaboo.mybatis.entity.Customer">
+          <!-- 配置Customer类的属性和字段名之间的对应关系 -->
+          <id column="customer_id" property="customerId"/>
+          <result column="customer_name" property="customerName"/>
+      </association>
+  </resultMap>
+  <!-- Order selectOrderWithCustomer(Integer orderId); -->
+  <select id="selectOrderWithCustomer" resultMap="selectOrderWithCustomerResultMap">
+      SELECT order_id,order_name,c.customer_id,customer_name
+      FROM t_order o
+      LEFT JOIN t_customer c
+      ON o.customer_id=c.customer_id
+      WHERE o.order_id=#{orderId}
+  </select>
+  ```
+
+- 一对多：<font color='red'>collection</font>、<font color='red'>ofType</font>
+
+  ```xml
+  <!-- 配置resultMap实现从Customer到OrderList的“对多”关联关系 -->
+  <resultMap id="selectCustomerWithOrderListResultMap" type="com.pokaboo.mybatis.entity.Customer">
+      <!-- 映射Customer本身的属性 -->
+      <id column="customer_id" property="customerId"/>
+      <result column="customer_name" property="customerName"/>
+      
+      <!-- collection标签：映射“对多”的关联关系 -->
+      <!-- property属性：在Customer类中，关联“多”的一端的属性名 -->
+      <!-- ofType属性：集合属性中元素的类型 -->
+      <collection property="orderList" ofType="com.pokaboo.mybatis.entity.Order">
+          <!-- 映射Order的属性 -->
+          <id column="order_id" property="orderId"/>
+          <result column="order_name" property="orderName"/>
+      </collection>
+  </resultMap>
+      
+  <!-- Customer selectCustomerWithOrderList(Integer customerId); -->
+  <select id="selectCustomerWithOrderList" resultMap="selectCustomerWithOrderListResultMap">
+      SELECT c.customer_id,c.customer_name,o.order_id,o.order_name
+      FROM t_customer c
+      LEFT JOIN t_order o
+      ON c.customer_id=o.customer_id
+      WHERE c.customer_id=#{customerId}
   </select>
   ```
 
