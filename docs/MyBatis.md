@@ -236,5 +236,191 @@
   </select>
   ```
 
+### 分步查询
+
+```xml
+<!-- orderList集合属性的映射关系，使用分步查询 -->
+<!-- 在collection标签中使用select属性指定要引用的SQL语句 -->
+<!-- select属性值的格式是：Mapper配置文件的名称空间.SQL语句id -->
+<!-- column属性：指定Customer和Order之间建立关联关系时所依赖的字段 -->
+<collection property="orderList" select="com.pokaboo.mybatis.mapper.CustomerMapper.selectOrderList" column="customer_id"/>
+```
+
+### 延迟加载
+
+```xml
+<!-- Mybatis全局配置 -->
+<settings>
+    <!-- 开启延迟加载功能 -->
+    <setting name="lazyLoadingEnabled" value="true"/>
+</settings>
+```
+
+### 动态SQL
+
+- if和where标签
+
+  ```xml
+  <!-- List<Employee> selectEmployeeByCondition(Employee employee); -->
+  <select id="selectEmployeeByCondition" resultType="com.pokaboo.mybatis.entity.Employee">
+      select emp_id,emp_name,emp_salary from t_emp
+      
+      <!-- where标签会自动去掉“标签体内前面、后面多余的and/or” -->
+      <where>
+          <!-- 使用if标签，让我们可以有选择的加入SQL语句的片段。这个SQL语句片段是否要加入整个SQL语句，就看if标签判断的结果是否为true -->
+          <!-- 在if标签的test属性中，可以访问实体类的属性，不可以访问数据库表的字段 -->
+          <if test="empName != null">
+              <!-- 在if标签内部，需要访问接口的参数时还是正常写#{} -->
+              or emp_name=#{empName}
+          </if>
+          <if test="empSalary &gt; 2000">
+              or emp_salary>#{empSalary}
+          </if>
+          <!--
+           第一种情况：所有条件都满足 WHERE emp_name=? or emp_salary>?
+           第二种情况：部分条件满足 WHERE emp_salary>?
+           第三种情况：所有条件都不满足 没有where子句
+           -->
+      </where>
+  </select>
+  ```
+
+- set标签：实际开发时，对一个实体类对象进行更新。往往不是更新所有字段，而是更新一部分字段。此时页面上的表单往往不会给不修改的字段提供表单项
+
+  ```xml
+  <!-- void updateEmployeeDynamic(Employee employee) -->
+  <update id="updateEmployeeDynamic">
+      update t_emp
+      <!-- set emp_name=#{empName},emp_salary=#{empSalary} -->
+      <!-- 使用set标签动态管理set子句，并且动态去掉两端多余的逗号 -->
+      <set>
+          <if test="empName != null">
+              emp_name=#{empName},
+          </if>
+          <if test="empSalary &lt; 3000">
+              emp_salary=#{empSalary},
+          </if>
+      </set>
+      where emp_id=#{empId}
+      <!--
+           第一种情况：所有条件都满足 SET emp_name=?, emp_salary=?
+           第二种情况：部分条件满足 SET emp_salary=?
+           第三种情况：所有条件都不满足 update t_emp where emp_id=?
+              没有set子句的update语句会导致SQL语法错误
+       -->
+  </update>
+  ```
+
+- trim：使用trim标签控制条件部分两端是否包含某些字符
+
+  ```xml
+  <!-- List<Employee> selectEmployeeByConditionByTrim(Employee employee) -->
+  <select id="selectEmployeeByConditionByTrim" resultType="com.pokaboo.mybatis.entity.Employee">
+      select emp_id,emp_name,emp_age,emp_salary,emp_gender
+      from t_emp
+      
+      <!-- prefix属性指定要动态添加的前缀 -->
+      <!-- suffix属性指定要动态添加的后缀 -->
+      <!-- prefixOverrides属性指定要动态去掉的前缀，使用“|”分隔有可能的多个值 -->
+      <!-- suffixOverrides属性指定要动态去掉的后缀，使用“|”分隔有可能的多个值 -->
+      <!-- 当前例子用where标签实现更简洁，但是trim标签更灵活，可以用在任何有需要的地方 -->
+      <trim prefix="where" suffixOverrides="and|or">
+          <if test="empName != null">
+              emp_name=#{empName} and
+          </if>
+          <if test="empSalary &gt; 3000">
+              emp_salary>#{empSalary} and
+          </if>
+          <if test="empAge &lt;= 20">
+              emp_age=#{empAge} or
+          </if>
+          <if test="empGender=='male'">
+              emp_gender=#{empGender}
+          </if>
+      </trim>
+  </select>
+  ```
+
+  - prefix属性：指定要动态添加的前缀
+  - suffix属性：指定要动态添加的后缀
+  - prefixOverrides属性：指定要动态去掉的前缀，使用“|”分隔有可能的多个值
+  - suffixOverrides属性：指定要动态去掉的后缀，使用“|”分隔有可能的多个值
+
+- choose/when/otherwise标签：多个分支条件中，仅执行一个
+
+  ```xml
+  <!-- List<Employee> selectEmployeeByConditionByChoose(Employee employee) -->
+  <select id="selectEmployeeByConditionByChoose" resultType="com.pokaboo.mybatis.entity.Employee">
+      select emp_id,emp_name,emp_salary from t_emp
+      where
+      <choose>
+          <when test="empName != null">emp_name=#{empName}</when>
+          <when test="empSalary &lt; 3000">emp_salary &lt; 3000</when>
+          <otherwise>1=1</otherwise>
+      </choose>
+      
+      <!--
+       第一种情况：第一个when满足条件 where emp_name=?
+       第二种情况：第二个when满足条件 where emp_salary < 3000
+       第三种情况：两个when都不满足 where 1=1 执行了otherwise
+       -->
+  </select>
+  ```
+
+- foreach标签：
+
+  ```xml
+  <!--
+      collection属性：要遍历的集合
+      item属性：遍历集合的过程中能得到每一个具体对象，在item属性中设置一个名字，将来通过这个名字引用遍历出来的对象
+      separator属性：指定当foreach标签的标签体重复拼接字符串时，各个标签体字符串之间的分隔符
+      open属性：指定整个循环把字符串拼好后，字符串整体的前面要添加的字符串
+      close属性：指定整个循环把字符串拼好后，字符串整体的后面要添加的字符串
+      index属性：这里起一个名字，便于后面引用
+          遍历List集合，这里能够得到List集合的索引值
+          遍历Map集合，这里能够得到Map集合的key
+   -->
+  <foreach collection="empList" item="emp" separator="," open="values" index="myIndex">
+      <!-- 在foreach标签内部如果需要引用遍历得到的具体的一个对象，需要使用item属性声明的名称 -->
+      (#{emp.empName},#{myIndex},#{emp.empSalary},#{emp.empGender})
+  </foreach>
+  ```
+
+  > 上面批量插入的例子本质上是一条SQL语句，而实现批量更新则需要多条SQL语句拼起来，用分号分开。也就是一次性发送多条SQL语句让数据库执行。此时需要在**数据库连接信息的URL地址**中设置：
+  >
+  > ```
+  > dev.url=jdbc:mysql://192.168.198.100:3306/test?allowMultiQueries=true
+  > ```
+  >
+  > ```
+  > 对应的foreach标签如下:
+  > <!-- int updateEmployeeBatch(@Param("empList") List<Employee> empList) -->
+  > <update id="updateEmployeeBatch">
+  >     <foreach collection="empList" item="emp" separator=";">
+  >         update t_emp set emp_name=#{emp.empName} where emp_id=#{emp.empId}
+  >     </foreach>
+  > </update>
+  > ```
+
+- SQL标签：
+
+  ```xml
+  <!-- 使用sql标签抽取重复出现的SQL片段 -->
+  <sql id="mySelectSql">
+  	select emp_id,emp_name,emp_age,emp_salary,emp_gender from t_emp
+  </sql>
   
+  <!-- 使用include标签引用声明的SQL片段 -->
+  <include refid="mySelectSql"/>
+  ```
+
+### 缓存
+
+### 逆向工程
+
+
+
+
+
+
 
