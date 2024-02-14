@@ -5,7 +5,7 @@
 	* [java多线程](./docs)
 	* [jvm](./docs)
 	* [Maven](./docs/Maven.md)
-	* [Spring](./docs/Spring/md)
+	* [Spring](./docs/Spring.md)
 	* [MyBatis](./docs/MyBatis.md)
 	* [SpringMvc](./docs/SpringMvc.md)
 	* [SpringBoot](./docs/SpringBoot.md)
