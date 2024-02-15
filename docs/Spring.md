@@ -74,4 +74,15 @@
 - AOP作用：
   - 代码简化：把方法中固定位置的重复的代码抽取出来，让被抽取的方法更专注于自己的核心功能，提高内聚性。
   - 代码增强：把特定的功能封装到切面类中，看哪里有需要，就往上套，被套用了切面逻辑的方法就被切面给增强了
-- 
+
+### 声明式事务
+
+[![pFGAT41.png](https://s11.ax1x.com/2024/02/15/pFGAT41.png)](https://imgse.com/i/pFGAT41)
+
+- DataSourceTransactionManager类中的主要方法：
+
+  - doBegin()：开启事务
+  - doSuspend()：挂起事务
+  - doResume()：恢复挂起的事务
+  - doCommit()：提交事务
+  - doRollback()：回滚事务
