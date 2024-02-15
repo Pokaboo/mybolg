@@ -7,7 +7,7 @@
 	* [Maven](./docs/Maven.md)
 	* [Spring](./docs/Spring.md)
 	* [MyBatis](./docs/MyBatis.md)
-	* [SpringMvc](./docs/SpringMvc.md)
+	* [SpringMVC](./docs/SpringMVC.md)
 	* [SpringBoot](./docs/SpringBoot.md)
 	* [SpringCloud](.docs)
 	* [Nginx](./docs/Nginx.md)

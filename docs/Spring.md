@@ -86,3 +86,5 @@
   - doResume()：恢复挂起的事务
   - doCommit()：提交事务
   - doRollback()：回滚事务
+
+- @Transactional

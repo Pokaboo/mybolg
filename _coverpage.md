@@ -4,5 +4,5 @@
 * 选择云卷云舒的小日子，选择自己喜欢的人
 
 
-[GitHub](https://github.com/Pokaboo) [Get Started](#Pokaboo)
+[GitHub](https://github.com/Pokaboo) [Get Started](./_sidebar.md)
 
