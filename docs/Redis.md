@@ -286,3 +286,19 @@
 - redis-server redis.conf 启动服务
 - redis-cli：客户端访问
 - shutdown：关闭服务
+
+### redis.conf
+
+- bind=127.0.0.1：默认情况bind=127.0.0.1只能接受本机的访问请求；不写的情况下，无限制接受任何ip地址的访问。生产环境肯定要写你应用服务器的地址
+
+- protected-mode：如果开启了protected-mode，那么在没有设定bind ip且没有设密码的情况下，Redis只允许接受本机的相应
+- timeout ： 一个空闲的客户端维持多少秒会关闭，0为永不关闭。
+- TCP keepalive：对访问客户端的一种心跳检测，每个n秒检测一次。官方推荐设为60秒。
+- daemonize ：是否为后台进程。
+- pidfile：存放pid文件的位置，每个实例会产生一个不同的pid文件。
+- log level：四个级别根据使用阶段来选择，生产环境选择notice 或者warning。
+- logfile：日志文件名称。
+- syslog：是否将Redis日志输送到linux系统日志服务中。
+- syslog-ident：日志的标志。
+- syslog-facility ：输出日志的设备。
+- database：设定库的数量 默认16。
