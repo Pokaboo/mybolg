@@ -1,5 +1,34 @@
 ## SpringBoot
 
+
+
+### 多环境profile切换配置
+
+### Spring Boot 自动配置
+
+- **@SpringBootApplication注解**
+  - @SpringBootConfiguration : 代表这个类就是一个配置类 , 本质上就是一个@Configuration注解
+  - @ComponentScan : 组件扫描, 默认扫描启动类所在包及子包下的类身上的注解
+  - @EnableAutoConfiguration : 自动配置注解 , 添加了此注解会自动去读取spring.factories配置文件中的自动配置类
+
+
+- **@ConfigurationProperties注解**
+  - @ConfigurationProperties是SpringBoot提供的重要注解, 他可以将一些配置属性**批量**注入到bean对象
+
+- **@ConditionalXxxx注解**
+
+  | 注解                            | 作用                             |
+  | ------------------------------- | -------------------------------- |
+  | @ConditionalOnBean              | 如果存在某个Bean, 配置类生效     |
+  | @ConditionalOnMissingBean       | 如果不存在某个Bean, 配置类生效   |
+  | @ConditionalOnClass             | 如果存在某个类, 配置类生效       |
+  | @ConditionalOnMissingClass      | 如果不存在某个类, 配置类生效     |
+  | @ConditionalOnProperty          | 如果存在某个属性配置, 配置类生效 |
+  | @ConditionalOnWebApplication    | 如果是一个web应用, 配置类生效    |
+  | @ConditionalOnNotWebApplication | 如果不是一个web应用, 配置类生效  |
+
+
+
 ### Spring Boot - 访问外部接口
  - 在Spring-Boot项目开发中，存在着本模块的代码需要访问外面模块接口，或外部url链接的需求, 比如调用外部的地图API或者天气API.
  - 方案一： 采用原生的Http请求
