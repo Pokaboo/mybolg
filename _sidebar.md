@@ -43,6 +43,7 @@
 * 项目
   * [谷粒商城-分布式基础](./docs/gulimall_base.md)
   * [一体化SAAS系统](./docs/saas.md)
+  * [通用权限系统](./docs/auth.md)
 
 
 
