@@ -9,6 +9,7 @@
   * [Maven](./docs/Maven.md)
   * [Spring](./docs/Spring.md)
   * [MyBatis](./docs/MyBatis.md)
+  * [Mybatis-Plus](./docs/Mybatis-Plus.md)
   * [SpringMvc](./docs/SpringMvc.md)
   * [SpringBoot](./docs/SpringBoot.md)
   * [SpringCloud](.docs)
