@@ -228,4 +228,131 @@ pokaboo-auth-parent：根目录，管理子模块：
   }
   ```
 
+
+### 集成knife4j
+
+文档地址：https://doc.xiaominfo.com/
+
+knife4j是为Java MVC框架集成Swagger生成Api文档的增强解决方案。
+
+- 添加依赖
+
+  ```xml
+  <dependency>
+      <groupId>com.github.xiaoymin</groupId>
+      <artifactId>knife4j-spring-boot-starter</artifactId>
+  </dependency>
+  ```
+
+- 添加knife4j配置类
+
+  ```java
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import springfox.documentation.builders.ApiInfoBuilder;
+  import springfox.documentation.builders.ParameterBuilder;
+  import springfox.documentation.builders.PathSelectors;
+  import springfox.documentation.builders.RequestHandlerSelectors;
+  import springfox.documentation.schema.ModelRef;
+  import springfox.documentation.service.ApiInfo;
+  import springfox.documentation.service.Contact;
+  import springfox.documentation.service.Parameter;
+  import springfox.documentation.spi.DocumentationType;
+  import springfox.documentation.spring.web.plugins.Docket;
+  import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
   
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  /**
+   * knife4j配置信息
+   */
+  @Configuration
+  @EnableSwagger2WebMvc
+  public class Knife4jConfig {
+  
+      @Bean
+      public Docket adminApiConfig(){
+          List<Parameter> pars = new ArrayList<>();
+          ParameterBuilder tokenPar = new ParameterBuilder();
+          tokenPar.name("token")
+                  .description("用户token")
+                  .defaultValue("")
+                  .modelRef(new ModelRef("string"))
+                  .parameterType("header")
+                  .required(false)
+                  .build();
+          pars.add(tokenPar.build());
+          //添加head参数end
+  
+          Docket adminApi = new Docket(DocumentationType.SWAGGER_2)
+                  .groupName("adminApi")
+                  .apiInfo(adminApiInfo())
+                  .select()
+                  //只显示admin路径下的页面
+                  .apis(RequestHandlerSelectors.basePackage("com.atguigu"))
+                  .paths(PathSelectors.regex("/admin/.*"))
+                  .build()
+                  .globalOperationParameters(pars);
+          return adminApi;
+      }
+  
+      private ApiInfo adminApiInfo(){
+  
+          return new ApiInfoBuilder()
+                  .title("后台管理系统-API文档")
+                  .description("本文档描述了后台管理系统微服务接口定义")
+                  .version("1.0")
+                  .contact(new Contact("qy", "http://pokaboo.cn", "pokaboo@163.com"))
+                  .build();
+      }
+  
+  }
+  ```
+
+- 注解
+
+  - @Api ：添加在控制器类上，通过此注解的tags属性，可以指定模块名称，并且，在指定名称时，建议在名称前添加数字作为序号，Knife4j会根据这些数字将各模块升序排列，例如：
+
+    > ```java
+    > @Api(value = "提供商品添加、修改、删除及查询的相关接⼝",tags = "01.商品管理")
+    > ```
+
+  - @ApiOpearation：添加在Api中处理请求的方法上，通过此注解的value属性，可以指定业务/请求资源的名称，例如：
+
+    > ```java
+    > @ApiOperation("添加商品")
+    > ```
+
+  - @ApiOperationSupport：添加在Api中处理请求的方法上，通过此注解的order属性（int），可以指定排序序号，Knife4j会根据这些数字将各业务/请求资源升序排列，例如：
+
+    > ```java
+    > @ApiOperationSupport(order = 100) 
+    > ```
+
+  - @ApiImplicitParams 和 @ApiImplicitParam：对于处理请求的方法的参数列表中那些未封装的参数（例如String、Long），需要在处理请求的方法上使用此注解来配置参数的说明，并且，必须配置name属性，此属性的值就是方法的参数名称，使得此注解的配置与参数对应上，然后，再通过value属性对参数进行说明，还要注意，此属性的required属性表示是否必须提交此参数，默认为false。另外，还可以通过dataType配置参数的数据类型，如果未配置此属性，在API文档中默认显示为string，可以按需修改为int、long等。例如：
+
+    > ```java
+    > @ApiImplicitParams({
+    >  @ApiImplicitParam(dataType = "string",name = "username", value = "⽤户登录账号",required =
+    > true),
+    >  @ApiImplicitParam(dataType = "string",name = "password", value = "⽤户登录密码",required =
+    > false,defaultValue = "111111")
+    > })
+    > ```
+
+  - @ApiModel：用来对实体类进行说明，例如：
+
+    > ```java
+    > @ApiModel(value = "User对象",description = "⽤户信息")
+    > ```
+
+  - @ApiModelProperty:作用在实体类的参数上，如果处理请求时，参数是封装的POJO类型，需要对各请求参数进行说明时，应该在此POJO类型的各属性上使用此注解，通过此注解的value属性配置请求参数的名称，通过requeired属性配置是否必须提交此请求参数（并不具备检查功能），例如：
+
+    > ```java
+    > @ApiModelProperty(dataType = "String",required = true, value = "⽤户注册账号")
+    > ```
+
+- 访问：http://ip:port/doc.html
+
+​	![Knife4j](icon/Knife4j.png)
