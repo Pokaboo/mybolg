@@ -194,7 +194,7 @@ npm --depth 9999 update
     }
     ```
 
-  - src/api/user.js：修改路由
+  - src/api/user.js：修改url
 
     ```js
     import request from '@/utils/request'
@@ -223,4 +223,69 @@ npm --depth 9999 update
     }
     ```
 
+  - src/store/modules/user.js：不用指定token参数
+  
+    ```js
+    getInfo({ commit }) {
+      return new Promise((resolve, reject) => {
+        getInfo().then(response => {
+          const { data } = response
+    
+          if (!data) {
+            return reject('Verification failed, please Login again.')
+          }
+    
+          const { name, avatar } = data
+    
+          commit('SET_NAME', name)
+          commit('SET_AVATAR', avatar)
+          resolve(data)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    ```
+  
+  - src/views/login/index.vue：更改页面标题
+  
+    ```html
+    <div class="title-container">
+      <h3 class="title">通用权限系统</h3>
+    </div>
+    ```
+  
+  - src/router/index.js：删除多余路由
+  
+    ```js
+    export const constantRoutes = [
+      {
+        path: '/login',
+        component: () => import('@/views/login/index'),
+        hidden: true
+      },
+    
+      {
+        path: '/404',
+        component: () => import('@/views/404'),
+        hidden: true
+      },
+    
+      {
+        path: '/',
+        component: Layout,
+        redirect: '/dashboard',
+        children: [{
+          path: 'dashboard',
+          name: 'Dashboard',
+          component: () => import('@/views/dashboard/index'),
+          meta: { title: 'Dashboard', icon: 'dashboard' }
+        }]
+      },
+    
+      // 404 page must be placed at the end !!!
+      { path: '*', redirect: '/404', hidden: true }
+    ]
+    ```
+  
     

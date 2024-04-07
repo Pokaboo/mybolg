@@ -356,3 +356,157 @@ knife4j是为Java MVC框架集成Swagger生成Api文档的增强解决方案。
 - 访问：http://ip:port/doc.html
 
 ​	![Knife4j](icon/Knife4j.png)
+
+
+
+### JWT
+
+- JWT是JSON Web Token的缩写，即JSON Web令牌，是一种自包含令牌。 是为了在网络应用环境间传递声明而执行的一种基于JSON的开放标准。JWT的声明一般被用来在身份提供者和服务提供者间传递被认证的用户身份信息，以便于从资源服务器获取资源。比如用在用户登录上。JWT最重要的作用就是对 token信息的防伪作用。
+
+- **JWT令牌的组成**：一个JWT由三个部分组成：**JWT头、有效载荷、签名哈希**最后由这三者组合进行base64url编码得到JWT。典型的，一个JWT看起来如下图：该对象为一个很长的字符串，字符之间通过"."分隔符分为三个子串。https://jwt.io/
+
+  ![JWT](icon/3402e929-2225-4c64-8f2e-4471b63366d0.png)
+
+- **JWT头**：WT头部分是一个描述JWT元数据的JSON对象，通常如下所示。
+
+  ```json
+   {  
+     "alg": "HS256",  
+     "typ": "JWT"
+   }
+  在上面的代码中，alg属性表示签名使用的算法，默认为HMAC SHA256（写为HS256）；
+  typ属性表示令牌的类型，JWT令牌统一写为JWT。
+  最后，使用Base64 URL算法将上述JSON对象转换为字符串保存。
+  ```
+
+- **有效载荷**：有效载荷部分，是JWT的主体内容部分，也是一个JSON对象，包含需要传递的数据。 JWT指定七个默认字段供选择。
+
+  ```json
+  iss: jwt签发者
+  sub: 主题
+  aud: 接收jwt的一方
+  exp: jwt的过期时间，这个过期时间必须要大于签发时间
+  nbf: 定义在什么时间之前，该jwt都是不可用的.
+  iat: jwt的签发时间
+  jti: jwt的唯一身份标识，主要用来作为一次性token,从而回避重放攻击。
+  ```
+
+  - 除以上默认字段外，我们还可以自定义私有字段，如下例：
+
+    ```
+    {
+      "name": "Helen",
+      "role": "editor",
+      "avatar": "helen.jpg"
+    }
+    ```
+
+  - 请注意，默认情况下JWT是未加密的，任何人都可以解读其内容，因此不要构建隐私信息字段，存放保密信息，以防止信息泄露。
+
+  - JSON对象也使用Base64 URL算法转换为字符串保存。
+
+- **签名哈希**：签名哈希部分是对上面两部分数据签名，通过指定的算法生成哈希，以确保数据不会被篡改。首先，需要指定一个密码（secret）。该密码仅仅为保存在服务器中，并且不能向用户公开。然后，使用标头中指定的签名算法（默认情况下为HMAC SHA256）根据以下公式生成签名。
+
+  ```
+  HMACSHA256(base64UrlEncode(header) + "." + base64UrlEncode(claims), secret)    ==>   签名hash
+  ```
+
+  - 在计算出签名哈希后，JWT头，有效载荷和签名哈希的三个部分组合成一个字符串，每个部分用"."分隔，就构成整个JWT对象。
+
+- **Base64URL算法**：如前所述，JWT头和有效载荷序列化的算法都用到了Base64URL。该算法和常见Base64算法类似，稍有差别。作为令牌的JWT可以放在URL中（例如api.example/?token=xxx）。 Base64中用的三个字符是"+"，"/"和"="，由于在URL中有特殊含义，因此Base64URL中对他们做了替换："="去掉，"+"用"-"替换，"/"用"_"替换，这就是Base64URL算法。
+
+### 项目集成JWT
+
+- 引入依赖
+
+  ```xml
+  <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+  </dependency>
+  ```
+
+- 添加JWT帮助类
+
+  ```java
+  import io.jsonwebtoken.*;
+  import org.springframework.util.StringUtils;
+  
+  import java.util.Date;
+  
+  /**
+   * 生成JSON Web令牌的工具类
+   */
+  public class JwtHelper {
+  
+      private static long tokenExpiration = 365 * 24 * 60 * 60 * 1000;
+      private static String tokenSignKey = "123456";
+  
+      public static String createToken(Long userId, String username) {
+          String token = Jwts.builder()
+                  .setSubject("AUTH-USER")
+                  .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))
+                  .claim("userId", userId)
+                  .claim("username", username)
+                  .signWith(SignatureAlgorithm.HS512, tokenSignKey)
+                  .compressWith(CompressionCodecs.GZIP)
+                  .compact();
+          return token;
+      }
+  
+      public static Long getUserId(String token) {
+          try {
+              if (StringUtils.isEmpty(token)) return null;
+  
+              Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token);
+              Claims claims = claimsJws.getBody();
+              Integer userId = (Integer) claims.get("userId");
+              return userId.longValue();
+          } catch (Exception e) {
+              e.printStackTrace();
+              return null;
+          }
+      }
+  
+      public static String getUsername(String token) {
+          try {
+              if (StringUtils.isEmpty(token)) return "";
+  
+              Jws<Claims> claimsJws = Jwts.parser().setSigningKey(tokenSignKey).parseClaimsJws(token);
+              Claims claims = claimsJws.getBody();
+              return (String) claims.get("username");
+          } catch (Exception e) {
+              e.printStackTrace();
+              return null;
+          }
+      }
+  
+      public static void removeToken(String token) {
+          //jwttoken无需删除，客户端扔掉即可。
+      }
+  
+      public static void main(String[] args) {
+          String token = JwtHelper.createToken(1L, "admin");//"eyJhbGciOiJIUzUxMiIsInppcCI6IkdaSVAifQ.H4sIAAAAAAAAAKtWKi5NUrJSCjAK0A0Ndg1S0lFKrShQsjI0MzY2sDQ3MTbQUSotTi3yTFGyMjKEsP0Sc1OBWp6unfB0f7NSLQDxzD8_QwAAAA.2eCJdsJXOYaWFmPTJc8gl1YHTRl9DAeEJprKZn4IgJP9Fzo5fLddOQn1Iv2C25qMpwHQkPIGukTQtskWsNrnhQ";//JwtHelper.createToken(7L, "admin");
+          System.out.println(token);
+          System.out.println(JwtHelper.getUserId(token));
+          System.out.println(JwtHelper.getUsername(token));
+      }
+  }
+  ```
+
+### JWT认证流程
+
+![JWT认证流程](icon/JWT认证流程.png)
+
+- 首先，前端通过Web表单将自己的用户名和密码发送到后端的接口。这一过程一般是一个HTTP POST请求。建议的方式是通过SSL加密的传输（https协议），从而避免敏感信息被嗅探。
+
+- 后端核对用户名和密码成功后，将用户的id等其他信息作为JWT Payload（负载），将其与头部分别进行Base64编码拼接后签名，形成一个JWT(Token)。形成的JWT就是一个形同lll.zzz.xxx的字符串。 token head.payload.singurater
+
+- 后端将JWT字符串作为登录成功的返回结果返回给前端。前端可以将返回的结果保存在localStorage或sessionStorage上，退出登录时前端删除保存的JWT即可。
+
+- 前端在每次请求时将JWT放入HTTP Header中的Authorization位。(解决XSS和XSRF问题) HEADER
+
+- 后端检查是否存在，如存在验证JWT的有效性。例如，检查签名是否正确；检查Token是否过期；检查Token的接收方是否是自己（可选）。
+
+- 验证通过后后端使用JWT中包含的用户信息进行其他逻辑操作，返回相应结果。
+  
