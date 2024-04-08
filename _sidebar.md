@@ -12,7 +12,7 @@
   * [Mybatis-Plus](./docs/Mybatis-Plus.md)
   * [SpringMvc](./docs/SpringMvc.md)
   * [SpringBoot](./docs/SpringBoot.md)
-  * [SpringSecurity](./docs/SpringSecurity.docx)
+  * [SpringSecurity](./docs/SpringSecurity.md)
   * [SpringCloud](.docs)
   * [Nginx](./docs/Nginx.md)
   * [dubbo](./docs)
