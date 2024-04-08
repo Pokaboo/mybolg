@@ -47,7 +47,7 @@ pokaboo-auth-parent：根目录，管理子模块：
 
   - 列表：
 
-    ```json
+    ```java
     {
       "code": 200,
       "message": "成功",
@@ -64,7 +64,7 @@ pokaboo-auth-parent：根目录，管理子模块：
 
   - 分页:
 
-    ```json
+    ```java
     {
       "code": 200,
       "message": "成功",
@@ -93,7 +93,7 @@ pokaboo-auth-parent：根目录，管理子模块：
 
   - 没有返回数据
 
-    ```json
+    ```java
     {
       "code": 200,
       "message": "成功",
@@ -509,4 +509,41 @@ knife4j是为Java MVC框架集成Swagger生成Api文档的增强解决方案。
 - 后端检查是否存在，如存在验证JWT的有效性。例如，检查签名是否正确；检查Token是否过期；检查Token的接收方是否是自己（可选）。
 
 - 验证通过后后端使用JWT中包含的用户信息进行其他逻辑操作，返回相应结果。
-  
+
+### Spring Security
+
+- Spring Security简介：Spring 是非常流行和成功的 Java 应用开发框架，Spring Security 正是 Spring 家族中的成员。Spring Security 基于 Spring 框架，提供了一套 Web 应用安全性的完整解决方案。正如你可能知道的关于安全方面的两个核心功能是“**认证**”和“**授权**”，一般来说，Web 应用的安全性包括**用户认证（Authentication）和用户授权（Authorization）**两个部分，这两点也是 SpringSecurity 重要核心功能。
+
+  - （1）用户认证指的是：验证某个用户是否为系统中的合法主体，也就是说用户能否访问该系统。用户认证一般要求用户提供用户名和密码，系统通过校验用户名和密码来完成认证过程。**通俗点说就是系统认为用户是否能登录**
+  - （2）用户授权指的是验证某个用户是否有权限执行某个操作。在一个系统中，不同用户所具有的权限是不同的。比如对一个文件来说，有的用户只能进行读取，而有的用户可以进行修改。一般来说，系统会为不同的用户分配不同的角色，而每个角色则对应一系列的权限。**通俗点讲就是系统判断用户是否有权限去做某些事情**
+
+- SpringSecurity 特点：
+
+  - Spring 无缝整合
+  -  全面的权限控制
+  - 专门为 Web 开发而设计
+    - 旧版本不能脱离 Web 环境使用
+    - 新版本对整个框架进行了分层抽取，分成了核心模块和 Web 模块。单独引入核心模块就可以脱离 Web 环境
+  - 重量级
+
+- Spring Security实现权限
+
+  ![Spring Security进行认证和鉴权](icon/Spring Security进行认证和鉴权.png)
+
+  - 如图所示，一个请求想要访问到API就会从左到右经过蓝线框里的过滤器，其中**绿色部分是负责认证的过滤器，蓝色部分是负责异常处理，橙色部分则是负责授权**。经过一系列拦截最终访问到我们的API。这里面我们只需要重点关注两个过滤器即可：`UsernamePasswordAuthenticationFilter`负责登录认证，`FilterSecurityInterceptor`负责权限授权。说明：**Spring Security的核心逻辑全在这一套过滤器中，过滤器里会调用各种组件完成功能，掌握了这些过滤器和组件你就掌握了Spring Security**！这个框架的使用方式就是对这些过滤器和组件进行扩展。
+
+  - 引入依赖
+
+    ```xml
+    <!-- Spring Security依赖 -->
+    <dependency>
+    	<groupId>org.springframework.boot</groupId>
+    	<artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    ```
+
+  - 用户认证
+
+    ![Spring Security用户认证流程](icon/Spring Security用户认证流程.png)
+
+    - 用户认证核心组件
