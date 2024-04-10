@@ -512,38 +512,292 @@ knife4j是为Java MVC框架集成Swagger生成Api文档的增强解决方案。
 
 ### Spring Security
 
-- Spring Security简介：Spring 是非常流行和成功的 Java 应用开发框架，Spring Security 正是 Spring 家族中的成员。Spring Security 基于 Spring 框架，提供了一套 Web 应用安全性的完整解决方案。正如你可能知道的关于安全方面的两个核心功能是“**认证**”和“**授权**”，一般来说，Web 应用的安全性包括**用户认证（Authentication）和用户授权（Authorization）**两个部分，这两点也是 SpringSecurity 重要核心功能。
+#### 1、Spring Security简介：
+
+- Spring 是非常流行和成功的 Java 应用开发框架，Spring Security 正是 Spring 家族中的成员。Spring Security 基于 Spring 框架，提供了一套 Web 应用安全性的完整解决方案。正如你可能知道的关于安全方面的两个核心功能是“**认证**”和“**授权**”，一般来说，Web 应用的安全性包括**用户认证（Authentication）和用户授权（Authorization）**两个部分，这两点也是 SpringSecurity 重要核心功能。
 
   - （1）用户认证指的是：验证某个用户是否为系统中的合法主体，也就是说用户能否访问该系统。用户认证一般要求用户提供用户名和密码，系统通过校验用户名和密码来完成认证过程。**通俗点说就是系统认为用户是否能登录**
+
   - （2）用户授权指的是验证某个用户是否有权限执行某个操作。在一个系统中，不同用户所具有的权限是不同的。比如对一个文件来说，有的用户只能进行读取，而有的用户可以进行修改。一般来说，系统会为不同的用户分配不同的角色，而每个角色则对应一系列的权限。**通俗点讲就是系统判断用户是否有权限去做某些事情**
 
-- SpringSecurity 特点：
+#### 2、SpringSecurity 特点：
 
-  - Spring 无缝整合
-  -  全面的权限控制
-  - 专门为 Web 开发而设计
-    - 旧版本不能脱离 Web 环境使用
-    - 新版本对整个框架进行了分层抽取，分成了核心模块和 Web 模块。单独引入核心模块就可以脱离 Web 环境
-  - 重量级
+- Spring 无缝整合
+-  全面的权限控制
+- 专门为 Web 开发而设计
+  - 旧版本不能脱离 Web 环境使用
+  - 新版本对整个框架进行了分层抽取，分成了核心模块和 Web 模块。单独引入核心模块就可以脱离 Web 环境
+- 重量级
 
-- Spring Security实现权限
+#### 3、Spring Security实现权限
 
-  ![Spring Security进行认证和鉴权](icon/Spring Security进行认证和鉴权.png)
+![Spring Security进行认证和鉴权](icon/Spring Security进行认证和鉴权.png)
 
-  - 如图所示，一个请求想要访问到API就会从左到右经过蓝线框里的过滤器，其中**绿色部分是负责认证的过滤器，蓝色部分是负责异常处理，橙色部分则是负责授权**。经过一系列拦截最终访问到我们的API。这里面我们只需要重点关注两个过滤器即可：`UsernamePasswordAuthenticationFilter`负责登录认证，`FilterSecurityInterceptor`负责权限授权。说明：**Spring Security的核心逻辑全在这一套过滤器中，过滤器里会调用各种组件完成功能，掌握了这些过滤器和组件你就掌握了Spring Security**！这个框架的使用方式就是对这些过滤器和组件进行扩展。
+- 如图所示，一个请求想要访问到API就会从左到右经过蓝线框里的过滤器，其中**绿色部分是负责认证的过滤器，蓝色部分是负责异常处理，橙色部分则是负责授权**。经过一系列拦截最终访问到我们的API。这里面我们只需要重点关注两个过滤器即可：`UsernamePasswordAuthenticationFilter`负责登录认证，`FilterSecurityInterceptor`负责权限授权。说明：**Spring Security的核心逻辑全在这一套过滤器中，过滤器里会调用各种组件完成功能，掌握了这些过滤器和组件你就掌握了Spring Security**！这个框架的使用方式就是对这些过滤器和组件进行扩展。
 
-  - 引入依赖
+- 引入依赖
 
-    ```xml
-    <!-- Spring Security依赖 -->
-    <dependency>
-    	<groupId>org.springframework.boot</groupId>
-    	<artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
+  ```xml
+  <!-- Spring Security依赖 -->
+  <dependency>
+  	<groupId>org.springframework.boot</groupId>
+  	<artifactId>spring-boot-starter-security</artifactId>
+  </dependency>
+  ```
+
+- 用户认证流程
+
+  ![Spring Security用户认证流程](icon/Spring Security用户认证流程.png)
+
+- 用户认证核心组件：我们系统中会有许多用户，确认当前是哪个用户正在使用我们系统就是登录认证的最终目的。这里我们就提取出了一个核心概念：**当前登录用户/当前认证用户**。整个系统安全都是围绕当前登录用户展开的，这个不难理解，要是当前登录用户都不能确认了，那A下了一个订单，下到了B的账户上这不就乱套了。这一概念在Spring Security中的体现就是 **`Authentication`**，它存储了认证信息，代表当前登录用户。我们在程序中如何获取并使用它呢？我们需要通过 **`SecurityContext`** 来获取`Authentication`，`SecurityContext`就是我们的上下文对象！这个上下文对象则是交由 **`SecurityContextHolder`** 进行管理，你可以在程序**任何地方**使用它：
+
+  ```java
+  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+  ```
+
+  - `SecurityContextHolder`原理非常简单，就是使用`ThreadLocal`来保证一个线程中传递同一个对象！
+
+  - Spring Security中三个核心组件：
+
+    ```java
+    1、Authentication：存储了认证信息，代表当前登录用户
+    2、SeucirtyContext：上下文对象，用来获取`Authentication`
+    3、SecurityContextHolder：上下文管理对象，用来在程序任何地方获取`SecurityContext`
+    Authentication中是什么信息呢：
+    1、Principal：用户信息，没有认证时一般是用户名，认证后一般是用户对象
+    2、Credentials：用户凭证，一般是密码
+    3、Authorities：用户权限
     ```
 
-  - 用户认证
+- 用户认证：Spring Security是怎么进行用户认证的呢？**`AuthenticationManager`** 就是Spring Security用于执行身份验证的组件，只需要调用它的`authenticate`方法即可完成认证。Spring Security默认的认证方式就是在`UsernamePasswordAuthenticationFilter`这个过滤器中进行认证的，该过滤器负责认证逻辑。Spring Security用户认证关键代码如下：
 
-    ![Spring Security用户认证流程](icon/Spring Security用户认证流程.png)
+  ```java
+  // 生成一个包含账号密码的认证信息
+  Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, passwrod);
+  // AuthenticationManager校验这个认证信息，返回一个已认证的Authentication
+  Authentication authentication = authenticationManager.authenticate(authenticationToken);
+  // 将返回的Authentication存到上下文中
+  SecurityContextHolder.getContext().setAuthentication(authentication);
+  ```
 
-    - 用户认证核心组件
+- 认证接口分析：`AuthenticationManager`的校验逻辑非常简单：根据用户名先查询出用户对象(没有查到则抛出异常)将用户对象的密码和传递过来的密码进行校验，密码不匹配则抛出异常。这个逻辑没啥好说的，再简单不过了。重点是这里每一个步骤Spring Security都提供了组件：
+
+  - 1、是谁执行 **根据用户名查询出用户对象** 逻辑的呢？用户对象数据可以存在内存中、文件中、数据库中，你得确定好怎么查才行。这一部分就是交由**`UserDetailsService`** 处理，该接口只有一个方法`loadUserByUsername(String username)`，通过用户名查询用户对象，默认实现是在内存中查询。
+
+  - 2、那查询出来的 **用户对象** 又是什么呢？每个系统中的用户对象数据都不尽相同，咱们需要确认我们的用户数据是啥样的才行。Spring Security中的用户数据则是由**`UserDetails`** 来体现，该接口中提供了账号、密码等通用属性。
+
+  - 3、**对密码进行校验**大家可能会觉得比较简单，`if、else`搞定，就没必要用什么组件了吧？但框架毕竟是框架考虑的比较周全，除了`if、else`外还解决了密码加密的问题，这个组件就是**`PasswordEncoder`**，负责密码加密与校验。我们可以看下`AuthenticationManager`校验逻辑的大概源码：
+
+    ```java
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    ...省略其他代码
+    
+        // 传递过来的用户名
+        String username = authentication.getName();
+        // 调用UserDetailsService的方法，通过用户名查询出用户对象UserDetail（查询不出来UserDetailService则会抛出异常）
+        UserDetails userDetails = this.getUserDetailsService().loadUserByUsername(username);
+    
+        // 获取传递过来的密码
+        String password = authentication.getCredentials().toString();
+        // 使用密码解析器PasswordEncoder传递过来的密码是否和真实的用户密码匹配
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+            // 密码错误则抛出异常
+            throw new BadCredentialsException("错误信息...");
+        }
+    
+        // 注意哦，这里返回的已认证Authentication，是将整个UserDetails放进去充当Principal
+        UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(userDetails,
+                authentication.getCredentials(), userDetails.getAuthorities());
+        return result;
+    
+    ...省略其他代码
+    }
+    ```
+
+    - `UserDetialsService`、`UserDetails`、`PasswordEncoder`，这三个组件Spring Security都有默认实现，这一般是满足不了我们的实际需求的，所以这里我们自己来实现这些组件！
+
+- 加密器PasswordEncoder：
+
+  - 自定义加密处理组件：CustomMd5PasswordEncoder
+
+    ```java
+    /**
+     * <p>
+     * 密码处理
+     * </p>
+     *
+     */
+    @Component
+    public class CustomMd5PasswordEncoder implements PasswordEncoder {
+    
+        public String encode(CharSequence rawPassword) {
+            return MD5.encrypt(rawPassword.toString());
+        }
+    
+        public boolean matches(CharSequence rawPassword, String encodedPassword) {
+            return encodedPassword.equals(MD5.encrypt(rawPassword.toString()));
+        }
+    }
+    ```
+
+- 用户对象UserDetails
+
+  - 该接口就是我们所说的用户对象，它提供了用户的一些通用属性，源码如下：
+
+    ```java
+    public interface UserDetails extends Serializable {
+    	/**
+         * 用户权限集合（这个权限对象现在不管它，到权限时我会讲解）
+         */
+        Collection<? extends GrantedAuthority> getAuthorities();
+        /**
+         * 用户密码
+         */
+        String getPassword();
+        /**
+         * 用户名
+         */
+        String getUsername();
+        /**
+         * 用户没过期返回true，反之则false
+         */
+        boolean isAccountNonExpired();
+        /**
+         * 用户没锁定返回true，反之则false
+         */
+        boolean isAccountNonLocked();
+        /**
+         * 用户凭据(通常为密码)没过期返回true，反之则false
+         */
+        boolean isCredentialsNonExpired();
+        /**
+         * 用户是启用状态返回true，反之则false
+         */
+        boolean isEnabled();
+    }
+    ```
+
+    - 实际开发中我们的用户属性各种各样，这些默认属性可能是满足不了，所以我们一般会自己实现该接口，然后设置好我们实际的用户实体对象。实现此接口要重写很多方法比较麻烦，我们可以继承Spring Security提供的`org.springframework.security.core.userdetails.User`类，该类实现了`UserDetails`接口帮我们省去了重写方法的工作：
+
+      - **添加CustomUser对象**
+
+        ```java
+        import lombok.Data;
+        import org.springframework.security.core.GrantedAuthority;
+        import org.springframework.security.core.userdetails.User;
+        
+        import java.util.Collection;
+        
+        public class CustomUser extends User {
+        
+            /**
+             * 我们自己的用户实体对象，要调取用户信息时直接获取这个实体对象
+             */
+            private SysUser sysUser;
+        
+            public CustomUser(SysUser sysUser, Collection<? extends GrantedAuthority> authorities) {
+                super(sysUser.getUsername(), sysUser.getPassword(), authorities);
+                this.sysUser = sysUser;
+            }
+        
+            public SysUser getSysUser() {
+                return sysUser;
+            }
+        
+            public void setSysUser(SysUser sysUser) {
+                this.sysUser = sysUser;
+            }
+            
+        }
+        ```
+
+- 自定义用户认证接口
+
+  ```java
+  import com.fasterxml.jackson.databind.ObjectMapper;
+  import org.springframework.security.authentication.AuthenticationManager;
+  import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+  import org.springframework.security.core.Authentication;
+  import org.springframework.security.core.AuthenticationException;
+  import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+  import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+  
+  import javax.servlet.FilterChain;
+  import javax.servlet.ServletException;
+  import javax.servlet.http.HttpServletRequest;
+  import javax.servlet.http.HttpServletResponse;
+  import java.io.IOException;
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  /**
+   * <p>
+   * 登录过滤器，继承UsernamePasswordAuthenticationFilter，对用户名密码进行登录校验
+   * </p>
+   *
+   */
+  public class TokenLoginFilter extends UsernamePasswordAuthenticationFilter {
+  
+      public TokenLoginFilter(AuthenticationManager authenticationManager) {
+          this.setAuthenticationManager(authenticationManager);
+          //指定登录接口及提交方式，可以指定任意路径
+          this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/admin/system/index/login","POST"));
+      }
+  
+      /**
+       * 登录认证
+       * @param req
+       * @param res
+       * @return
+       * @throws AuthenticationException
+       */
+      @Override
+      public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
+              throws AuthenticationException {
+          try {
+              LoginVo loginVo = new ObjectMapper().readValue(req.getInputStream(), LoginVo.class);
+  
+              Authentication authenticationToken = new UsernamePasswordAuthenticationToken(loginVo.getUsername(), loginVo.getPassword());
+              return this.getAuthenticationManager().authenticate(authenticationToken);
+          } catch (IOException e) {
+              throw new RuntimeException(e);
+          }
+      }
+  
+      /**
+       * 登录成功
+       * @param request
+       * @param response
+       * @param chain
+       * @param auth
+       * @throws IOException
+       * @throws ServletException
+       */
+      @Override
+      protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+                                              Authentication auth) throws IOException, ServletException {
+          CustomUser customUser = (CustomUser) auth.getPrincipal();
+          String token = JwtHelper.createToken(customUser.getSysUser().getId(), customUser.getSysUser().getUsername());
+  
+          Map<String, Object> map = new HashMap<>();
+          map.put("token", token);
+          ResponseUtil.out(response, Result.ok(map));
+      }
+  
+      /**
+       * 登录失败
+       * @param request
+       * @param response
+       * @param e
+       * @throws IOException
+       * @throws ServletException
+       */
+      @Override
+      protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                                AuthenticationException e) throws IOException, ServletException {
+         ResponseUtil.out(response,Result.build(null,444,failed.getMessage()));
+      }
+  }
+  ```
+
+  
