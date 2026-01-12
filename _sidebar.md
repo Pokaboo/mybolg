@@ -46,6 +46,7 @@
   * [谷粒商城-分布式基础](./docs/gulimall_base.md)
   * [一体化SAAS系统](./docs/saas.md)
   * [通用权限系统](./docs/auth.md)
+  * [Pokaboo Clud系统](./docs/pokabooclub.md)
 
 * 面试
   * [面试相关](./docs/面试.md)
