@@ -106,6 +106,74 @@
 
 ### 泛型
 
+- 基本概念：在定义类、接口或方法时，同时声明一个或多个类型变量（如<E>），称为泛型类、泛型接口、泛型方法，统称为泛型。
+- 识别特征：任何带有尖括号类型变量（如<E>）的类、接口或方法都称为泛型。
+- 泛型的作用：
+  - 编译时约束：在编译阶段约束操作的数据类型，避免强制类型转换及其可能出现的异常。
+  - 类型统一：确保集合中只能操作某种特定数据类型，如ArrayList<String>﻿只能存储字符串。
+  - 避免强制转换：使用泛型的ArrayList需要强制转换，当遇到Boolean类型转String时会抛出ClassCastException异常。
+
+### Object类
+
+- Object类是Java中所有类的超类，任何类都直接或间接继承自Object类
+- 通用方法特性：所有类的对象都可以直接使用Object类中提供的通用方法，实现"一劳永逸"的设计思想
+
+### Objects类
+
+- 替代对象比较：在Java开发中，Sun公司官方代码使用Objects.equals()而非对象自身的equals()方法进行对象比较
+
+- 空指针问题：当主调对象为null时，直接调用equals()会抛出NullPointerException，而Objects.equals()能安全处理null值
+
+- ###### equals方法
+
+  - 安全比较：public static boolean equals(Object a, Object b)先做非空判断再比较
+  - 源码原理：实现逻辑为return (a == b) || (a != null && a.equals(b))
+  - 使用场景：比较两个对象内容时推荐使用，特别是可能为null的对象
+  - 优势对比
+    - 传统equals：t1.equals(t2)在t1为null时抛出异常
+    - Objects.equals：Objects.equals(t1,t2)返回false不报错
+
+- ###### isNull方法
+
+  - 功能：public static boolean isNull(Object obj)判断对象是否为null
+  - 等价写法：obj == null，但使用isNull()方法更符合工具类规范
+  - 源码实现：直接返回obj == null的判断结果
+
+- ###### nonNull方法
+
+  - 功能：public static boolean nonNull(Object obj)判断对象是否非null
+  - 等价写法：obj != null，工具类方法更具可读性
+  - 源码实现：直接返回obj != null的判断结果
+
+### 包装类
+
+- 设计初衷：实现Java"万物皆对象"的核心思想，解决8种基本数据类型不是对象的问题
+- 必要性：基本类型数据存储在栈内存，而对象存储在堆内存，包装类可将基本类型"包装"成对象
+- 应用场景：泛型和集合只能操作对象，不支持基本类型，必须使用包装类
+
+### 常用API
+
+![常用API](icon/常用API.png)
+
+- StringBuilder：可变字符串对象: 相当于一个容器，内部字符串内容可以改变，专门用于字符串操作
+
+  - 优势: 比String更适合字符串修改操作，效率更高，代码更简洁
+  - 构造器
+    - public StringBuilder()：创建空白可变字符串对象
+    - public StringBuilder(String str)：创建指定内容的可变字符串对象
+  - 核心方法
+    - append(任意类型)：添加数据并返回对象本身（支持链式编程）
+    - reverse()：反转内容
+    - length()：返回内容长度
+    - toString()：转换为String对象
+
+- ###### StringBuffer与StringBuilder
+
+  |               | 线程安全性                           | 性能差异                            | 使用场景           |
+  | ------------- | ------------------------------------ | ----------------------------------- | ------------------ |
+  | StringBuffer  | 线程安全的（方法加synchronized修饰） | StringBuilder性能略优于StringBuffer | 多线程环境考虑使用 |
+  | StringBuilder | 是线程不安全                         | StringBuilder性能略优于StringBuffer | 单线程环境优先使用 |
 
 
-> 02阶段：java进阶+ai  >  day03-面向对象高级部分：匿名内部类，泛型，枚举 >  09、认识泛型
+
+> 02阶段：java进阶+ai  >  day04-常用API >  09、认识泛型
