@@ -136,6 +136,8 @@
 
 ### 包装类
 
+### ![包装类](icon/包装类.png)
+
 - 设计初衷：实现Java"万物皆对象"的核心思想，解决8种基本数据类型不是对象的问题
 - 必要性：基本类型数据存储在栈内存，而对象存储在堆内存，包装类可将基本类型"包装"成对象
 - 应用场景：泛型和集合只能操作对象，不支持基本类型，必须使用包装类
@@ -160,6 +162,33 @@
   | StringBuffer  | 线程安全的（方法加synchronized修饰） | StringBuilder性能略优于StringBuffer | 多线程环境考虑使用 |
   | StringBuilder | 是线程不安全                         | StringBuilder性能略优于StringBuffer | 单线程环境优先使用 |
 
+### StringJoiner
 
+- 基本特性
+  - JDK8新增的字符串操作类
+  - 与StringBuilder类似，都是可变字符串容器
+  - 性能高效且在某些场景下代码更简洁
+- 适用场景
+  - 特别适合需要自动处理间隔符的字符串拼接
+  - 适用于不确定是否到达最后一个数据的遍历拼接
+
+- 性能问题：String拼接字符串速度慢，StringBuilder虽然快但需要手动处理间隔符号
+- 代码简洁性：StringBuilder需要判断是否为最后一个数据来添加间隔符，代码编写较繁琐
+
+### Math
+
+### ![math](icon/Math.png)
+
+### Runtime
+
+### ![Runtime](icon/Runtime.png)
+
+### System![System](icon/System.png)
+
+### BigDecimal
+
+### LocalDate、LocalTime、LocalDateTime
+
+#### ZonedId、ZonedDateTime
 
 > 02阶段：java进阶+ai  >  day04-常用API >  03、StringJoiner
