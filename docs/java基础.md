@@ -187,8 +187,12 @@
 
 ### BigDecimal
 
+- 用于解决小数运算中, 出现的不精确问题
+
+![BigDecimal](icon/BigDecimal.png)
+
 ### LocalDate、LocalTime、LocalDateTime
 
 #### ZonedId、ZonedDateTime
 
-> 02阶段：java进阶+ai  >  day04-常用API >  03、StringJoiner
+> 02阶段：java进阶+ai  >  day04-常用API > 06、LocalDate、LocalTime、LocalDateTime
